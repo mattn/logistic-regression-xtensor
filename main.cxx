@@ -84,19 +84,19 @@ int main() {
   // make onehot values of names
   std::map<std::string, std::size_t> labels;
   std::vector<float> counts;
+  std::vector<std::string> tmp;
   for (auto &name : names) {
     std::size_t &label = labels[name];
-    if (label == 0) label = labels.size();
+    if (label == 0) {
+      label = labels.size();
+      tmp.push_back(name);
+    }
     counts.push_back((float) (label - 1));
   }
+  names = tmp;
 
   auto y = xt::adapt(counts, {counts.size()});
   y /= (float) labels.size();
-
-  names.clear();
-  for(auto& k : labels) {
-    names.push_back(k.first);
-  }
 
   // make factor from input values
   auto w = logistic_regression(X, y, 0.01f, 1000);

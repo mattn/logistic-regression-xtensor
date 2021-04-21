@@ -40,10 +40,7 @@ logistic_regression(xt::xarray<float> X, xt::xarray<float> y, float rate, int nt
       auto pred = softmax(x, w);
       auto perr = y[i] - pred;
       auto scale = rate * perr * pred * (1 - pred);
-      auto dx = x * scale;
-      for (auto j = 0; j < x.shape(0); j++) {
-        w += dx;
-      }
+      w += x * scale * x.shape(0);
     }
   }
 

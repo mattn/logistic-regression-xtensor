@@ -21,7 +21,7 @@
 
 static float
 softmax(xt::xarray<float> w, xt::xarray<float> x) {
-  auto v = xt::linalg::dot(w, x).at(0);
+  auto v = xt::linalg::dot(w, x)[0];
   return 1.0f / (1.0f + std::exp(-v));
 }
 
@@ -37,14 +37,13 @@ logistic_regression(xt::xarray<float> X, xt::xarray<float> y, float rate, int nt
   for (auto n = 0; n < ntrains; n++) {
     for (auto i = 0; i < X.shape(0); i++) {
       auto x = xt::row(X, i);
-      auto t = xt::xarray<float>(x);
-      auto pred = softmax(t, w);
-      auto perr = y.at(0, i) - pred;
+      auto pred = softmax(x, w);
+      auto perr = xt::row(y, i)[0] - pred;
       auto scale = rate * perr * pred * (1 - pred);
-      auto dx = x;
-      dx += x;
-      dx *= scale;
-      w += dx;
+      auto dx = x * scale;
+      for (auto j = 0; j < X.shape(1); j++) {
+        w += dx;
+      }
     }
   }
 
@@ -83,8 +82,7 @@ int main() {
     names.push_back(cells.at(4));
   }
   // make vector 4 dimentioned
-  auto X = xt::adapt(rows, {rows.size()/4, (std::size_t)4});
-  X.reshape({(int)rows.size()/4, -1});
+  auto X = xt::adapt(rows, {(std::size_t)rows.size()/4, (std::size_t)4});
 
   // make onehot values of names
   std::map<std::string, size_t> labels;
@@ -104,13 +102,14 @@ int main() {
   }
 
   // make factor from input values
-  auto w = logistic_regression(X, y, 0.1f, 300);
-
+  auto w = logistic_regression(X, y, 0.1f, 5000);
   std::cout << w << std::endl;
+
   // predict samples
   for (auto i = 0; i < X.shape(0); i++) {
-    auto&& x = xt::row(X, i);
+    auto x = xt::row(X, i);
     auto n = (size_t) ((double) predict(w, x) * (double) labels.size());
+    //std::cout << n << " " << predict(w, x) << std::endl;
     if (n > names.size() - 1) n = names.size() - 1;
     std::cout << names[n] << std::endl;
   }

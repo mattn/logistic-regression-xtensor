@@ -38,10 +38,10 @@ logistic_regression(xt::xarray<float> X, xt::xarray<float> y, float rate, int nt
     for (auto i = 0; i < X.shape(0); i++) {
       auto x = xt::row(X, i);
       auto pred = softmax(x, w);
-      auto perr = xt::row(y, i)[0] - pred;
+      auto perr = y[i] - pred;
       auto scale = rate * perr * pred * (1 - pred);
       auto dx = x * scale;
-      for (auto j = 0; j < X.shape(1); j++) {
+      for (auto j = 0; j < x.shape(0); j++) {
         w += dx;
       }
     }
@@ -91,9 +91,9 @@ int main() {
   }
   std::vector<float> counts;
   for (auto& name : names) {
-    if (labels.count(name) > 0) counts.push_back((float)labels[name]);
+    if (labels.count(name) > 0) counts.push_back((float)(labels[name] - 1));
   }
-  auto y = xt::adapt(counts, {(std::size_t) 1, counts.size()});
+  auto y = xt::adapt(counts, {counts.size()});
   y /= (float) labels.size();
 
   names.clear();
@@ -102,14 +102,12 @@ int main() {
   }
 
   // make factor from input values
-  auto w = logistic_regression(X, y, 0.1f, 5000);
-  std::cout << w << std::endl;
+  auto w = logistic_regression(X, y, 0.01f, 500);
 
   // predict samples
   for (auto i = 0; i < X.shape(0); i++) {
     auto x = xt::row(X, i);
     auto n = (size_t) ((double) predict(w, x) * (double) labels.size());
-    //std::cout << n << " " << predict(w, x) << std::endl;
     if (n > names.size() - 1) n = names.size() - 1;
     std::cout << names[n] << std::endl;
   }

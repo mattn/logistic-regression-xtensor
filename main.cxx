@@ -82,14 +82,14 @@ int main() {
   auto X = xt::adapt(rows, {(std::size_t)rows.size()/4, (std::size_t)4});
 
   // make onehot values of names
-  std::map<std::string, size_t> labels;
-  for(auto& name : names) {
-    if (labels.count(name) == 0) labels.emplace(name, labels.size());
-  }
+  std::map<std::string, std::size_t> labels;
   std::vector<float> counts;
-  for (auto& name : names) {
-    counts.push_back((float)(labels[name]));
+  for (auto &name : names) {
+    std::size_t &label = labels[name];
+    if (label == 0) label = labels.size();
+    counts.push_back((float) (label - 1));
   }
+
   auto y = xt::adapt(counts, {counts.size()});
   y /= (float) labels.size();
 
@@ -99,12 +99,12 @@ int main() {
   }
 
   // make factor from input values
-  auto w = logistic_regression(X, y, 0.01f, 500);
+  auto w = logistic_regression(X, y, 0.01f, 1000);
 
   // predict samples
   for (auto i = 0; i < X.shape(0); i++) {
     auto x = xt::row(X, i);
-    auto n = (size_t) ((double) predict(w, x) * (double) labels.size());
+    auto n = (std::size_t) ((double) predict(w, x) * (double) labels.size());
     if (n > names.size() - 1) n = names.size() - 1;
     std::cout << names[n] << std::endl;
   }

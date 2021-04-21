@@ -84,11 +84,11 @@ int main() {
   // make onehot values of names
   std::map<std::string, size_t> labels;
   for(auto& name : names) {
-    if (labels.count(name) == 0) labels[name] = labels.size();
+    if (labels.count(name) == 0) labels.emplace(name, labels.size());
   }
   std::vector<float> counts;
   for (auto& name : names) {
-    if (labels.count(name) > 0) counts.push_back((float)(labels[name] - 1));
+    counts.push_back((float)(labels[name]));
   }
   auto y = xt::adapt(counts, {counts.size()});
   y /= (float) labels.size();

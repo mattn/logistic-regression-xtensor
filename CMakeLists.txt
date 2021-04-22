@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.1)
+if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    project(logstic-regression-xtensor)
+    find_package(xtensor REQUIRED CONFIG)
+    set(XTENSOR_INCLUDE_DIR ${xtensor_INCLUDE_DIR})
+endif ()
+
+include_directories(${XTENSOR_INCLUDE_DIR})
+find_package(cblas REQUIRED)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -mtune=native -std=c++14")
+add_executable(logistic-regression-xtensor main.cxx ${XTENSOR_HEADERS})
+target_link_libraries(logistic-regression-xtensor ${CBLAS_LIBRARIES})

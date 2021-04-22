@@ -99,7 +99,7 @@ int main() {
   y /= (float) labels.size();
 
   // make factor from input values
-  auto w = logistic_regression(X, y, 0.05f, 1000);
+  auto w = logistic_regression(X, y, 0.05f, 5000);
 
   // predict samples
   for (auto i = 0; i < X.shape(0); i++) {

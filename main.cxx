@@ -58,7 +58,8 @@ split(std::string& fname, char delimiter) {
   return result;
 }
 
-int main() {
+int
+main() {
   xt::random::seed(time(NULL));
   std::ifstream ifs("iris.csv");
 
@@ -78,14 +79,14 @@ int main() {
     rows.push_back(std::stof(cells.at(3)));
     names.push_back(cells.at(4));
   }
-  // make vector 4 dimentioned
+  // make vector 4 dimensioned
   auto X = xt::adapt(rows, {(std::size_t)rows.size()/4, (std::size_t)4});
 
-  // make onehot values of names
+  // make one-hot values of names
   std::map<std::string, std::size_t> labels;
   std::vector<float> counts;
   std::vector<std::string> tmp;
-  for (auto &name : names) {
+  for (auto& name : names) {
     std::size_t &label = labels[name];
     if (label == 0) {
       label = labels.size();
